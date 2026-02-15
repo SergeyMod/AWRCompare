@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWR/pg_profile Сравнение отчетов</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .file-input-wrapper:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .file-input-wrapper .placeholder {
+            color: #666;
+        }
+        
+        .file-input-wrapper .filename {
+            color: #667eea;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .info-box {
+            background: #f8f9ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .info-box ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .info-box li {
+            padding: 5px 0;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .info-box li:before {
+            content: "✓ ";
+            color: #667eea;
+        }
+        
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        
+        .flash {
+            padding: 12px 20px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .flash.error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+        
+        .flash.success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Сравнение отчетов AWR и pg_profile</h1>
+            <p>Автоматизация сравнения производительности баз данных Oracle и PostgreSQL</p>
+        </div>
+        
+        <div class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <div class="info-box">
+                <h3>Поддерживаемые типы сравнения:</h3>
+                <ul>
+                    <li>Oracle AWR ↔ Oracle AWR</li>
+                    <li>PostgreSQL pg_profile ↔ PostgreSQL pg_profile</li>
+                    <li>Oracle AWR ↔ PostgreSQL pg_profile (кросс-платформенное)</li>
+                </ul>
+            </div>
+            
+            <div class="info-box">
+                <h3>Поддерживаемые форматы файлов:</h3>
+                <ul>
+                    <li>HTML отчеты AWR (Oracle)</li>
+                    <li>Текстовые отчеты AWR (Oracle)</li>
+                    <li>HTML отчеты pg_profile (PostgreSQL)</li>
+                    <li>Текстовые отчеты pg_profile (PostgreSQL)</li>
+                </ul>
+            </div>
+            
+            <form action="{{ url_for('upload_files') }}" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>📄 Базовый отчет</label>
+                    <div class="file-input-wrapper" id="base-wrapper">
+                        <input type="file" name="base_file" id="base_file" accept=".html,.txt" required>
+                        <div class="placeholder">
+                            <div style="font-size: 24px; margin-bottom: 10px;">📁</div>
+                            <div>Перетащите файл или нажмите для выбора</div>
+                            <div style="font-size: 12px; color: #999; margin-top: 5px;">Поддерживаются .html и .txt файлы</div>
+                        </div>
+                        <div class="filename" id="base-filename"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>📄 Целевой отчет</label>
+                    <div class="file-input-wrapper" id="target-wrapper">
+                        <input type="file" name="target_file" id="target_file" accept=".html,.txt" required>
+                        <div class="placeholder">
+                            <div style="font-size: 24px; margin-bottom: 10px;">📁</div>
+                            <div>Перетащите файл или нажмите для выбора</div>
+                            <div style="font-size: 12px; color: #999; margin-top: 5px;">Поддерживаются .html и .txt файлы</div>
+                        </div>
+                        <div class="filename" id="target-filename"></div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-block">📤 Загрузить и продолжить</button>
+            </form>
+        </div>
+        
+        <div class="footer">
+            Курсовая работа по дисциплине "Проектирование информационных систем"
+        </div>
+    </div>
+    
+    <script>
+        // Отображение имени выбранного файла
+        document.getElementById('base_file').addEventListener('change', function(e) {
+            const filename = e.target.files[0]?.name;
+            document.getElementById('base-filename').textContent = filename || '';
+        });
+        
+        document.getElementById('target_file').addEventListener('change', function(e) {
+            const filename = e.target.files[0]?.name;
+            document.getElementById('target-filename').textContent = filename || '';
+        });
+    </script>
+</body>
+</html>
