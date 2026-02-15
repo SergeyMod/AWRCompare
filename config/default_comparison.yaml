@@ -1,0 +1,73 @@
+# Настройки сравнения по умолчанию
+
+# Выбранные таблицы для сравнения по платформам
+selected_tables_by_platform:
+  oracle_oracle:
+    - load_profile
+    - top_sql_elapsed
+    - wait_events
+    - io_statistics
+    
+  postgres_postgres:
+    - general_statistics
+    - wait_events
+    - queries_statistics
+    - io_statistics
+    
+  cross_platform:
+    - general_performance
+    - io_comparison
+    - top_queries
+
+# Пороговые значения для отклонений
+thresholds:
+  same_platform:
+    warning_percent: 15
+    critical_percent: 30
+    
+  cross_platform:
+    warning_percent: 25
+    critical_percent: 50
+
+# Настройки форматирования вывода
+output_format:
+  decimal_places: 2
+  show_percentage: true
+  show_absolute_change: true
+  highlight_critical: true
+  
+  # Символы для индикации изменений
+  indicators:
+    increase: "↑"
+    decrease: "↓"
+    no_change: "="
+    warning: "⚠"
+    critical: "❗"
+
+# Настройки экспорта
+export:
+  default_format: "html"
+  available_formats:
+    - html
+    - csv
+    - json
+    - xlsx
+  
+  html_template: "templates/comparison_report.html"
+  
+  # Включать ли графики в отчет
+  include_charts: true
+
+# Игнорируемые столбцы при сравнении
+ignored_columns:
+  - "Rank"
+  - "Row#"
+  - "ID"
+  - "Snapshot"
+
+# Настройки логирования
+logging:
+  level: "INFO"
+  file: "logs/awr_compare.log"
+  max_size_mb: 10
+  backup_count: 5

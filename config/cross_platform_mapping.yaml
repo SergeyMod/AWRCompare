@@ -1,0 +1,80 @@
+# Маппинг метрик для кросс-платформенного сравнения
+metric_mapping:
+  oracle_to_postgres:
+    "DB Time per second":
+      - "DB time"
+      - "Database Time"
+    "Logical reads":
+      - "Blocks read"
+      - "Buffer gets"
+    "Physical reads":
+      - "Physical reads"
+      - "Disk reads"
+    "CPU usage":
+      - "CPU usage"
+      - "% CPU"
+    "Executions":
+      - "Calls"
+      - "Executions"
+    "Parse time":
+      - "Planning time"
+      - "Parse time"
+    
+  postgres_to_oracle:
+    "Total time":
+      - "DB Time"
+      - "CPU time"
+    "Blocks read":
+      - "Logical reads"
+      - "Consistent gets"
+    "Shared buffers hits":
+      - "Buffer cache hit"
+      - "Cache hit"
+    "Calls":
+      - "Executions"
+      - "Execute count"
+
+# Доступные таблицы по типу отчета
+available_tables_by_report_type:
+  oracle_awr:
+    - load_profile
+    - instance_efficiency
+    - top_sql_elapsed
+    - top_sql_cpu
+    - wait_events
+    - io_statistics
+    - memory_statistics
+    - time_model_statistics
+    
+  postgresql_pg_profile:
+    - general_statistics
+    - wait_events
+    - database_statistics
+    - queries_statistics
+    - io_statistics
+    - table_statistics
+    - index_statistics
+
+# Стратегия сравнения
+comparison_strategy:
+  same_platform:
+    oracle_oracle: "Прямое сравнение идентичных метрик"
+    postgres_postgres: "Прямое сравнение идентичных метрик"
+  
+  cross_platform:
+    oracle_postgres: "Сравнение по маппингу общих метрик + анализ архитектурных различий"
+    postgres_oracle: "Сравнение по маппингу общих метрик + анализ архитектурных различий"
+
+# Описание таблиц для отображения
+table_descriptions:
+  load_profile: "Профиль нагрузки"
+  instance_efficiency: "Эффективность экземпляра"
+  top_sql_elapsed: "Топ SQL по времени выполнения"
+  top_sql_cpu: "Топ SQL по использованию CPU"
+  wait_events: "События ожидания"
+  io_statistics: "Статистика ввода-вывода"
+  general_statistics: "Общая статистика"
+  database_statistics: "Статистика базы данных"
+  queries_statistics: "Статистика запросов"
+  table_statistics: "Статистика таблиц"
+  index_statistics: "Статистика индексов"
